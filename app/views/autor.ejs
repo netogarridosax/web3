@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+    <img src="/_img/logo.png" alt="logo IFCE" width="300" height="200">
+    <%- include('/home/node/app/views/cabecalho.ejs') %>
+    <h1><%= nome %></h1>
+    <section>
+        <h1>Formações</h1>
+        <ul>
+<%
+for (let formacao of formacoes) {
+%>
+            <li><%= formacao %></li>
+<%
+}
+%>
+        </ul>
+    </section>
+</body>
+</html>
