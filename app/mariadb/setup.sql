@@ -2,7 +2,7 @@ CREATE TABLE papeis (
     id INT PRIMARY KEY AUTO_INCREMENT,
     nome VARCHAR(45)
 );
-CREATE TABLE usuarios (
+CREATE TABLE admins (
     id INT PRIMARY KEY AUTO_INCREMENT,
     nome VARCHAR(45),
     senha VARCHAR(45),

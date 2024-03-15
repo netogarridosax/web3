@@ -14,15 +14,15 @@ router.get('/placas/editar/:id', (req, res) => {
     placaController.editar(req, res);
 });
 
-router.get('/admin', (req, res) => {
+router.get('/Admin', (req, res) => {
     const messages = req.flash();
-    res.render('admin', { messages });
+    res.render('Admin', { messages });
 });
 
-router.get('/admin/create', (req, res) => res.render('criar_admin'));
-router.get('/admin/login', (req, res) => adminController.showLoginForm(req, res));
-router.post('/admin/login', (req, res) => adminController.login(req, res));
-router.get('/admins', (req, res) => adminController.list(req, res)); 
+router.get('/Admin/create', (req, res) => res.render('criar_Admin'));
+router.get('/Admin/login', (req, res) => AdminController.showLoginForm(req, res));
+router.post('/Admin/login', (req, res) => AdminController.login(req, res));
+router.get('/Admins', (req, res) => AdminController.list(req, res)); 
 router.post('/placas', (req, res) => placaController.create(req, res));
 router.get('/placas', (req, res) => placaController.list(req, res));
 router.put('/placas/:id', (req, res) => placaController.update(req, res));
