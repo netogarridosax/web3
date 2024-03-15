@@ -2,6 +2,18 @@
 <html lang="pt-BR">
 
 <head>
+    <link rel="manifest" href="/manifest.json">
+    <script>if ('serviceWorker' in navigator) {
+            window.addEventListener('load', async () => {
+                try {
+                    let registration = await navigator.serviceWorker.register('/_js/service-worker.js')
+                    console.log('Service Worker registered:', registration);
+                } catch (error) {
+                    console.log('Service Worker registration failed:', error);
+                }
+            });
+        }</script>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Index</title>
@@ -28,8 +40,8 @@
         <p><strong>Descrição do problema:</strong></p>
         <p>Calcule a área de um letreiro publicitário em forma de pentágono. Se a área for maior que 20 metros
             quadrados, é um letreiro grande. Se for menor que 20 metros quadrados, é um letreiro pequeno.</p>
-            <form action="/placas" method="post">
-                <label>
+        <form action="/placas" method="post">
+            <label>
                 <span>Nome</span>
                 <input name="nome">
             </label>
