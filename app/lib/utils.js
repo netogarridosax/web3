@@ -35,7 +35,6 @@ const utils = {
                 console.log(i++, corpoTexto);
             });
             req.on('end', () => {
-                // chave=valor&chave2=valor2
                 let corpo = utils.decoficarUrl(corpoTexto);
                 
                 resolve(corpo);

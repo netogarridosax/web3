@@ -1,15 +1,20 @@
-const utils = require("../lib/utils")
-
 class AutorController {
-    autor(req, res) {
-        let autor = {
+    index(req, res) {
+        const autor = {
             nome: 'Garrido',
             formacoes: [
-                'cursando técnico em informática para web'
+                'Técnico em Informática para Internet',
+                'Instituto Federal do Ceará',
+                'Ano: 2023'
+            ],
+            experiencias: [
+                'Militar do Exército Brasileiro',
+                'Ano: Desde 2017'
             ]
-        }
+        };
 
-        utils.renderizarEjs(res, './views/autor.ejs', autor);
+        res.render('autor', autor);
     }
 }
+
 module.exports = AutorController;

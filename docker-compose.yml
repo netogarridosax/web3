@@ -9,7 +9,7 @@ services:
     volumes:
       - ./app:/home/node/app
       - /home/node/app/node_modules
-  bd:
+  database:
     image: mariadb:latest
     env_file: .env
     volumes:

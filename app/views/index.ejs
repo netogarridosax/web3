@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Index</title>
-    <script src="/_js/area.js"></script>
+    <script src="/public/_js/area.js"></script>
     <style>
         .grande {
             color: green;
@@ -21,14 +21,15 @@
 
 <body>
     <img src="/_img/logo.png" alt="logo IFCE" width="300" height="200">
-    <%- include('/home/node/app/views/cabecalho.ejs') %>
+    <%- include('cabecalho.ejs') %>
+
 
         <h1>Problema: Cálculo da Área de um Letreiro Publicitário em forma de pentágono.</h1>
         <p><strong>Descrição do problema:</strong></p>
         <p>Calcule a área de um letreiro publicitário em forma de pentágono. Se a área for maior que 20 metros
             quadrados, é um letreiro grande. Se for menor que 20 metros quadrados, é um letreiro pequeno.</p>
-        <form method="post" onSubmit="event.preventDefault(); calcularArea();">
-            <label>
+            <form action="/placas" method="post">
+                <label>
                 <span>Nome</span>
                 <input name="nome">
             </label>
