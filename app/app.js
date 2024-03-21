@@ -1,109 +1,104 @@
 const express = require('express');
-const bodyParser = require('body-parser');
-const http = require('http');
-const mysql = require('mysql');
+const app = express();
+const PORT = 3000;
 
-const PlacaController = require('./controllers/PlacaControllers');
+const PlacaController = require('./controllers/PlacaController');
 const EstaticoController = require('./controllers/EstaticoController');
 const AutorController = require('./controllers/AutorController');
 const AuthController = require('./controllers/AuthController');
-const UsuariosController = require('./controllers/UsuariosControllers');
-const PlacasDao = require('./lib/projeto/PlacasDao');
-const UsuariosDao = require('./lib/projeto/UsuariosDao');
-const PlacasMysqlDao = require('./lib/projeto/PlacasMysqlDao');
-const UsuariosMysqlDao = require('./lib/projeto/UsuariosMysqlDao');
+const PlacaSequelizeDao = require('./lib/placa/PlacaSequelizeDao');
+const PlacaDao = require('./lib/placa/PlacaDao');
+const bodyParser = require('body-parser');
+const Sequelize = require('sequelize');
+const passport = require('passport');
+const JwtStrategy = require('passport-jwt').Strategy,
+    ExtractJwt = require('passport-jwt').ExtractJwt;
 
-const app = express();
-const PORT = process.env.PORT || 3000;
+let opts = {}
+opts.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
+opts.secretOrKey = process.env.SEGREDO_JWT;
+passport.use(new JwtStrategy(opts, function(jwt_payload, done) {
+    console.log('verificação jwt' , jwt_payload);
+    return done(null, jwt_payload);
+}));
 
-const pool = mysql.createPool({
-    connectionLimit: 10,
+
+
+const sequelize = new Sequelize(
+  process.env.MARIADB_DATABASE,
+  'root',
+  process.env.MARIADB_PASSWORD,
+  {
     host: 'bd',
-    user: process.env.MARIADB_USER,
-    password: process.env.MARIADB_PASSWORD,
-    database: process.env.MARIADB_DATABASE
-});
+    dialect: 'mysql'
+  }
+);
 
-app.use(bodyParser.urlencoded({ extended: true }));
+app.set('view engine', 'ejs');
 
-let placasDao = new PlacasDao();
-let usuariosDao = new UsuariosDao();
-let placaController = new PlacaController(placasDao);
+let placaDao = new PlacaSequelizeDao(sequelize);
+let placaController = new PlacaController(placaDao);
 let estaticoController = new EstaticoController();
 let autorController = new AutorController();
-let authController = new AuthController(usuariosDao);
-let usuariosController = new UsuariosController(usuariosDao);
+let authController = new AuthController(placaDao);
 
-app.get('/index', (req, res) => {
-    placaController.index(req, res);
+app.use(express.static('public'))
+app.use(express.urlencoded({ extended: false }));
+
+app.use((req, res, next) => {
+  const currentDate = new Date().toLocaleDateString();
+  const currentTime = new Date().toLocaleTimeString();
+  const requestInfo = `${currentDate} ${currentTime} - Rota: ${req.path}`;
+
+  console.log(requestInfo);
+
+  next();
 });
 
-app.get('/area', (req, res) => {
-    placaController.area(req, res);
+app.set('views', __dirname + '/views');
+app.use(bodyParser.urlencoded({ extended: true }));
+
+app.use('/placas', placaController.getRouter());
+
+app.use((req, res, next) => {
+  res.locals.dadosPersonalizados = { chave: 'valor' };
+  console.log('middleware 0')
+  next();
 });
 
-app.get('/placas', (req, res) => {
-    authController.autorizar(req, res, () => {
-        placaController.listar(req, res);
-    }, ['admin', 'geral']);
+app.get([
+  '/',
+  '/index'
+  ], (req, res) => {
+      console.log('custom', req.dadosPersonalizados); 
+      placaController.index(req, res)
 });
 
-app.post('/placas', (req, res) => {
-    authController.autorizar(req, res, () => {
-        placaController.inserir(req, res);
-    }, ['admin', 'geral']);
-});
+app.get('/index', (req, res) => res.render('index'));
+app.post('/placas', (req, res) => placaController.area(req, res));
+app.get('/autor', (req, res) => autorController.autor(req, res));
 
-app.put('/placas', (req, res) => {
-    authController.autorizar(req, res, () => {
-        placaController.alterar(req, res);
-    }, ['admin', 'geral']);
-});
-
-app.delete('/placas', (req, res) => {
-    authController.autorizar(req, res, () => {
-        placaController.apagar(req, res);
-    }, ['admin']);
-});
-
-app.get('/usuarios', (req, res) => {
-    usuariosController.listar(req, res);
-});
-
-app.post('/usuarios', (req, res) => {
-    usuariosController.inserir(req, res);
-});
-
-app.put('/usuarios', (req, res) => {
-    authController.autorizar(req, res, () => {
-        usuariosController.alterar(req, res);
-    }, ['admin', 'geral']);
-});
-
-app.delete('/usuarios', (req, res) => {
-    authController.autorizar(req, res, () => {
-        usuariosController.apagar(req, res);
-    }, ['admin']);
-});
-
-app.get('/autor', (req, res) => {
-    autorController.autor(req, res);
-});
+app.get('/perfil' , passport.authenticate('jwt', { session: false, failureRedirect: '/login' }), (req, res) => {
+    res.json({'usuario': req.user});
+})
 
 app.get('/login', (req, res) => {
-    authController.index(req, res);
+  authController.index(req, res);
 });
 
 app.post('/logar', (req, res) => {
-    authController.logar(req, res);
+  authController.logar(req, res);
 });
 
-app.use((req, res) => {
-    estaticoController.procurar(req, res);
+app.get('*', (req, res, next) => {
+  res.status(404).send('Nao encontrado')
+});
+
+app.use(function (err, req, res, next) {
+  console.error('registrando erro: ', err.stack)
+  res.status(500).send('Erro no servidor: ' + err.message);
 });
 
 app.listen(PORT, () => {
-    console.log(`Server listening on port ${PORT}`);
+  console.log(`Servidor iniciado na porta ${PORT}`);
 });
-
-// TESTE COMMIT

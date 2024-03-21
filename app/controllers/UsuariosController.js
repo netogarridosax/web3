@@ -1,14 +1,15 @@
-const Placa = require('./../lib/projeto/placa');
-const utils = require('../lib/utils');
+const Usuario = require('./../lib/placa/usuario.js');
+const utils = require('../lib/utils.js');
 
-class PlacasController {
-    constructor(placasDao) {
-        this.placasDao = placasDao;
+class UsuariosController {
+    constructor(usuariosDao) {
+        this.usuariosDao = usuariosDao;
     }
     index(req, res) {
-        utils.renderizarEjs(res, './views/index.ejs');      
+        utils.renderizarEjs(res, './views/index.ejs');
     }
-    area(req, res){               
+
+    async calcularArea(req, res){               
         let corpoTexto ='';
         req.on('data', function (pedaco) {
             corpoTexto += pedaco;
@@ -21,18 +22,19 @@ class PlacasController {
                 query[variavel] = valor;
             }
             let placa = new Placa();
-            placa.nome = query.nome;
-            placa.lado = parseFloat(query.lado);        
+            Placa.nome = query.nome;
+            placa.lado = parseFloat(query.lado);
+                       
             utils.renderizarEjs(res, './views/area.ejs', placa);
         })
     }
 
-    async listar(req, res) {
-        let placas = this.placasDao.listar();
-        let dados = placas.map(placa => {
+    listar(req, res) {
+        let usuarios = this.usuariosDao.listar();
+
+        let dados = usuarios.map(usuario => {
             return {
-                ...placa,
-                area: placa.area(),
+                ...usuario
             };
         })
 
@@ -40,15 +42,14 @@ class PlacasController {
     }
     
     async inserir(req, res) {
-        let placa = await this.getPlacaDaRequisicao(req);
+        let usuario = await this.getUsuarioDaRequisicao(req);
         try {
-            this.placasDao.inserir(placa);
+            this.usuariosDao.inserir(usuario);
             utils.renderizarJSON(res, {
-                placa: {
-                    ...placa,
-                    area: placa.area(),
+                usuario: {
+                    ...usuario
                 },
-                mensagem: 'mensagem_placa_cadastrado'
+                mensagem: 'mensagem_usuario_cadastrado'
             });
         } catch (e) {
             utils.renderizarJSON(res, {
@@ -58,15 +59,15 @@ class PlacasController {
     }
 
     async alterar(req, res) {
-        let placa = await this.getPlacaDaRequisicao(req);
+        let usuario = await this.getUsuariosDaRequisicao(req);
         let [ url, queryString ] = req.url.split('?');
         let urlList = url.split('/');
         url = urlList[1];
         let id = urlList[2];
         try {
-            this.placasDao.alterar(id, placa);
+            this.usuariosDao.alterar(id, usuario);
             utils.renderizarJSON(res, {
-                mensagem: 'mensagem_placa_alterado'
+                mensagem: 'mensagem_usuario_alterado'
             });
         } catch (e) {
             utils.renderizarJSON(res, {
@@ -80,22 +81,22 @@ class PlacasController {
         let urlList = url.split('/');
         url = urlList[1];
         let id = urlList[2];
-        this.placasDao.apagar(id);
+        this.usuariosDao.apagar(id);
         utils.renderizarJSON(res, {
-            mensagem: 'mensagem_placa_apagado',
+            mensagem: 'mensagem_usuario_apagado',
             id: id
         });
     }
 
-    async getPlacaDaRequisicao(req) {
+    async getUsuarioDaRequisicao(req) {
         let corpo = await utils.getCorpo(req);
-        let placa = new Placa(
+        let usuario = new Usuario(
             corpo.nome,
-            parseFloat(corpo.lado),
+            corpo.senha,
             corpo.papel
         );
-        return placa;
+        return usuario;
     }
 }
 
-module.exports = PlacasController;
+module.exports = UsuariosController;

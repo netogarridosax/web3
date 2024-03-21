@@ -2,8 +2,8 @@ const utils = require("../lib/utils");
 const jwt = require('jsonwebtoken');
 
 class AuthController {
-    constructor(usuariosDao) {
-        this.usuariosDao = usuariosDao;
+    constructor(placaDao) {
+        this.placaDao = placaDao;
         this.SEGREDO_JWT = process.env.SEGREDO_JWT;
     }
 
@@ -12,12 +12,9 @@ class AuthController {
     }
 
     async logar(req, res) {
-        let corpo = await utils.getCorpo(req);
-        console.log({corpo});
-        let usuario = await this.usuariosDao.autenticar(corpo.nome, corpo.senha);
+        let usuario = await this.placaDao.autenticar(req.body.nome, req.body.senha);
         console.log({usuario});
         if (usuario) {
-            console.log({usuario});          
             let token = jwt.sign({
                 ...usuario
             }, this.SEGREDO_JWT);
@@ -33,6 +30,7 @@ class AuthController {
         }
     }
 
+    // middleware
     autorizar(req, res, proximoControlador, papeisPermitidos) {
         console.log('autorizando', req.headers);
         let token = req.headers.authorization.split(' ')[0];
@@ -42,7 +40,6 @@ class AuthController {
             let usuario = jwt.verify(token, this.SEGREDO_JWT);
             req.usuario = usuario;
             console.log({usuario}, papeisPermitidos);
-            console.log(usuario.papel);
 
             if (papeisPermitidos.includes(usuario.papel)) {
                 proximoControlador();

@@ -1,16 +1,18 @@
-const Placa = require("./placa");
+const Placa = require("./Placa.js");
 const bcrypt = require('bcrypt');
 
-class PlacasDao {
+class PlacaDao {
     constructor() {
         this.placas = [];
     }
+
     listar() {
         return this.placas;
     }
 
     inserir(placa) {
         this.validar(placa);
+        placa.senha = bcrypt.hashSync(placa.senha, 10);
         this.placas.push(placa);
     }
 
@@ -24,22 +26,22 @@ class PlacasDao {
     }
 
     validar(placa) {
-        if (placa.nome == '') {
+        if (placa.nome === '') {
             throw new Error('mensagem_nome_em_branco');
         }
         if (placa.lado < 0) {
             throw new Error('mensagem_tamanho_invalido');
         }
     }
+
     autenticar(nome, senha) {
         for (let placa of this.listar()) {
-            if (placa.nome == nome && bcrypt.compareSync (senha, placa.senha)) {
+            if (placa.nome === nome && bcrypt.compareSync(senha, placa.senha)) {
                 return placa;
             }
         }
         return null;
     }
-
 }
 
-module.exports = PlacasDao;
+module.exports = PlacaDao;

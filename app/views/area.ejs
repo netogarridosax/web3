@@ -1,40 +1,46 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
+<!-- public/views/area.ejs -->
 
+<!DOCTYPE html>
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Área</title>
+    <link rel="stylesheet" href="/styles.css">
+    <style>
+        .resultado {
+            text-align: center;
+            margin: 50px auto;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+    </style>
 </head>
+<body class="<%= isErro ? 'erro' : 'sucesso' %> <%= area < 20 ? 'pequeno' : 'grande' %>">
+    <%- include ('cabecalho.ejs') %>
 
-<body>
-    
-    <%- include('/home/node/app/views/cabecalho.ejs') %>
-
-    
-    <h1>Explicação da conta</h1>
-    <p>A área de um pentágono regular pode ser calculada usando a fórmula:</p>
-    <p><strong>Área = (5/4) * lado^2 * (1 / tan(π/5))</strong></p>
-    <p>- <strong>lado</strong>: Comprimento de um lado do pentágono.</p>
-    <p>- <strong>π</strong>: Número Pi (aproximadamente 3.14159).</p>
-    <p>- <strong>tan(π/5)</strong>: Tangente do ângulo π/5 (36 graus), metade do ângulo central de um pentágono regular.
-    </p>
-    <p>- <strong>(5/4)</strong>: Constante de conversão.</p>
-    <p>A fórmula calcula a área multiplicando o comprimento do lado pelo seu quadrado e pela tangente do ângulo π/5. O
-        resultado é a área do pentágono.</p>
-
-    
-    <h1>Resposta:</h1>
-    <p>Nome inserido: <%= nome %></p>
-    <p>Lado do pentágono inserido: <%= lado %></p>
-    <p>Área do pentágono: <%= area().toFixed(2) %> metros quadrados</p>
-
-    
-    <% if (area() > 20) { %>
-        <p>É uma placa grande.</p>
-    <% } else { %>
-        <p>É uma placa pequena.</p>
-    <% } %>
+    <div class="resultado">
+        <% if (isErro) { %>
+            <h1>Erro no Cálculo</h1>
+            <p>Comprimento do lado inválido. Certifique-se de fornecer um número válido.</p>
+        <% } else { %>
+            <h1>Resultado do Cálculo</h1>
+            <p>Nome do Letreiro: <%= nome %></p>
+            <p>Lado: <%= lado %> metros</p>
+            <p>Área: <%= area.toFixed(2) %> metros quadrados</p>
+            <% if (area < 20) { %>
+                <p>É um letreiro pequeno.</p>
+            <% } else { %>
+                <p>É um letreiro grande.</p>
+            <% } %>
+            <p><strong>Explicação da Fórmula:</strong></p>
+            <p>A fórmula para calcular a área de um letreiro publicitário em forma de pentágono é a seguinte:</p>
+            <p>Área = (5/4) * lado^2 * (1 / tan(π/5))</p>
+            <p>Onde:</p>
+            <p>"Área" é a área do letreiro publicitário.</p>
+            <p>"lado" é o comprimento de um dos lados do letreiro.</p>
+            <p>"tan(π/5)" é a tangente do ângulo π/5, que representa um dos ângulos internos do pentágono regular.</p>
+            <h1>Desenvolvido por Garrido</h1>
+        <% } %>
+    </div>
 </body>
-
 </html>
