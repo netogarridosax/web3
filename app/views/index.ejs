@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Index</title>
-    <script src="/_js/area.js"></script>
+    <script src="/_js/placa.js"></script> 
     <style>
         .grande {
             color: green;
@@ -17,29 +17,64 @@
             font-weight: bold;
         }
     </style>
+        <title>Área da Placa</title>
+        <link rel="stylesheet" href="/styles.css">
+
 </head>
-
 <body>
-    <img src="/_img/logo.png" alt="logo IFCE" width="300" height="200">
     <%- include('cabecalho.ejs') %>
+    <img src="/_img/logo.png" alt="logo IFCE" width="300" height="200">
 
+    <h1>Problema: Cálculo da Área de um Letreiro Publicitário em forma de pentágono.</h1>
+    <p><strong>Descrição do problema:</strong></p>
+    <p>Calcule a área de um letreiro publicitário em forma de pentágono. Se a área for maior que 20 metros
+        quadrados, é um letreiro grande. Se for menor que 20 metros quadrados, é um letreiro pequeno.</p>
 
-        <h1>Problema: Cálculo da Área de um Letreiro Publicitário em forma de pentágono.</h1>
-        <p><strong>Descrição do problema:</strong></p>
-        <p>Calcule a área de um letreiro publicitário em forma de pentágono. Se a área for maior que 20 metros
-            quadrados, é um letreiro grande. Se for menor que 20 metros quadrados, é um letreiro pequeno.</p>
-            <form action="/placas" method="post">
-                <label>
+        <div id="resposta"></div>
+        <div id="mensagem"></div>
+        <form method="post" onsubmit="event.preventDefault(); area();">
+            <label>
                 <span>Nome</span>
                 <input name="nome">
             </label>
             <label>
-                <span>Lado do Pentágono (em metros)</span>
+                <span>Lado</span>
                 <input name="lado">
             </label>
-            <button>Calcular</button>
+            <label>
+                <span>ID placa</span>
+                <input name="id_papel" type="number">
+            </label>
+            <label>
+                <span>Senha</span>
+                <input name="senha" type="password">
+            </label>
+            <button type="submit">Ok</button>
         </form>
-        <div id="resposta"></div>
+        <button onclick="listar();">Listar</button>
+        <table>
+            <tr>
+                <th>ID</th>
+                <th>Nome</th>
+                <th>Lado</th>
+                <th>Senha</th>
+                <th>Placa</th>
+                <th>Ações</th> 
+            </tr>
+            <tbody id="placas">
+                <tr>
+                    <td>1</td>
+                    <td>NG CAR</td>
+                    <td>4</td>
+                    <td>********</td> 
+                    <td>Placa</td> 
+                    <td>
+                        <button onclick="editar(1);">Editar</button>
+                        <button onclick="apagar(1);">Apagar</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>        
+    </div>
 </body>
-
 </html>
