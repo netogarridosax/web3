@@ -1,41 +1,38 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="/styles.css">
+
 </head>
+
 <body>
-    <%- include ('cabecalho.ejs') %>    <div class="container">
-        <div class="autor-info">
-            <div class="autor-images">
-                <img class="autor-img" src="/_img/autor.png" alt="Foto do Autor">
-                <img class="autor-img" src="/_img/autor1.png" alt="Foto do Autor">
-            </div>
-            <div class="autor-texto">
-                <h1><%= autor.nome %></h1>
-                <section class="informacoes">
-                    <h1>Formações</h1>
-                    <ul>
-                        <% for (let formacao of autor.formacoes) { %>
-                            <li><%= formacao %></li>
-                        <% } %>
-                    </ul>
-                </section>
-                <section class="experiencia">
-                    <h1>Experiência Profissional</h1>
-                    <ul>
-                        <% for (let experiencia of autor.experienciaProfissional) { %>
-                            <li>
-                                <strong>Cargo:</strong> <%= experiencia.cargo %><br>
-                                <strong>Departamento:</strong> <%= experiencia.departamento %><br>
-                                <strong>Ano:</strong> <%= experiencia.ano %>
-                            </li>
-                        <% } %>
-                    </ul>
-                </section>
-            </div>
-        </div>
-    </div>
+    <%- include('cabecalho.ejs') %>
+    <img src="/_img/logo.png" alt="logo IFCE" width="300" height="200">
+        <h1>
+            <%= nome %>
+        </h1>
+        <section>
+            <h1>Formações</h1>
+            <ul>
+                <% for (let formacao of formacoes) { %>
+                    <li>
+                        <%= formacao %>
+                    </li>
+                    <% } %>
+            </ul>
+        </section>
+        <section>
+            <h1>Experiência profissional</h1>
+            <ul>
+                <% for (let experiencia of experiencias) { %>
+                    <li>
+                        <%= experiencia %>
+                    </li>
+                    <% } %>
+            </ul>
+        </section>
 </body>
+
 </html>
