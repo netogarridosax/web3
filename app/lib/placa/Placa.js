@@ -1,15 +1,6 @@
 const { Sequelize, DataTypes, Model } = require('sequelize');
 
 class Placa extends Model {
-    /*constructor(nome, lado, senha, papel, id) {
-        this.nome = nome;
-        this.lado = parseFloat(lado);
-        this.senha = senha;
-        this.papel = papel;
-        this.area();
-        this.id = id
-    }*/
-
     calcularArea() {
         if (!isNaN(this.lado) && this.lado >= 0) {
             this.area = 2 * this.lado * this.lado * (1 + Math.sqrt(2));
@@ -23,8 +14,19 @@ class Placa extends Model {
 
     setLado(lado) {
         this.lado = parseFloat(lado);
-        this.area();
+        this.calcularArea();
     }
 }
 
-module.exports = Placa;
+module.exports = (sequelize) => {
+    Placa.init({
+        
+        nome: DataTypes.STRING,
+        lado: DataTypes.FLOAT
+    }, {
+        sequelize,
+        modelName: 'Placa'
+    });
+
+    return Placa;
+};

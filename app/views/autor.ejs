@@ -1,27 +1,38 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-    <head>
-        <meta charset="UTF-8">
-    </head>
-    <body>
-        <img src="/_img/logo.png" alt="logo IFCE" width="300" height="200">
-        <%- include('cabecalho.ejs') %>
-        <h1><%= nome %></h1>
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="/styles.css">
+
+</head>
+
+<body>
+    <%- include('cabecalho.ejs') %>
+    <img src="/_img/logo.png" alt="logo IFCE" width="300" height="200">
+        <h1>
+            <%= nome %>
+        </h1>
         <section>
             <h1>Formações</h1>
             <ul>
                 <% for (let formacao of formacoes) { %>
-                    <li><%= formacao %></li>
-                <% } %>
+                    <li>
+                        <%= formacao %>
+                    </li>
+                    <% } %>
             </ul>
         </section>
         <section>
             <h1>Experiência profissional</h1>
             <ul>
                 <% for (let experiencia of experiencias) { %>
-                    <li><%= experiencia %></li>
-                <% } %>
+                    <li>
+                        <%= experiencia %>
+                    </li>
+                    <% } %>
             </ul>
         </section>
-    </body>
+</body>
+
 </html>

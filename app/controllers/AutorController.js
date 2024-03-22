@@ -1,5 +1,5 @@
 class AutorController {
-    index(req, res) {
+    autor(req, res) {
         const autor = {
             nome: 'Garrido',
             formacoes: [
