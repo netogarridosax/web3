@@ -30,7 +30,6 @@ class AuthController {
         }
     }
 
-    // middleware
     autorizar(req, res, proximoControlador, papeisPermitidos) {
         console.log('autorizando', req.headers);
         let token = req.headers.authorization.split(' ')[0];
