@@ -23,7 +23,7 @@ passport.use(new JwtStrategy(opts, function(jwt_payload, done) {
 
 const sequelize = new Sequelize(
   process.env.MARIADB_DATABASE,
-  'root',
+  process.env.MARIADB_USER,
   process.env.MARIADB_PASSWORD,
   {
     host: 'bd',
