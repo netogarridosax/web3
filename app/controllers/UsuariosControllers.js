@@ -5,9 +5,32 @@ class UsuariosController {
     constructor(usuariosDao) {
         this.usuariosDao = usuariosDao;
     }
+    index(req, res) {
+        utils.renderizarEjs(res, './views/index.ejs');
+    }
 
-    async listar(req, res) {
-        let usuarios = await this.usuariosDao.listar();
+    async calcularArea(req, res){               
+        let corpoTexto ='';
+        req.on('data', function (pedaco) {
+            corpoTexto += pedaco;
+        });
+        req.on('end', () => {
+            let propriedades = corpoTexto.split('&');
+            let query = {};
+            for (let propriedade of propriedades) {
+                let [variavel, valor] = propriedade.split('=');
+                query[variavel] = valor;
+            }
+            let pentagono = new Pentagono();
+            Pentagono.nome = query.nome;
+            pentagono.lado = parseFloat(query.lado);
+                       
+            utils.renderizarEjs(res, './views/pentagono.ejs', pentagono);
+        })
+    }
+
+     listar(req, res) {
+        let usuarios = this.usuariosDao.listar();
 
         let dados = usuarios.map(usuario => {
             return {

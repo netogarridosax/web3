@@ -42,7 +42,6 @@ class AuthController {
             let usuario = jwt.verify(token, this.SEGREDO_JWT);
             req.usuario = usuario;
             console.log({usuario}, papeisPermitidos);
-            console.log(usuario.papel);
 
             if (papeisPermitidos.includes(usuario.papel)) {
                 proximoControlador();

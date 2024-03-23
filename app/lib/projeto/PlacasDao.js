@@ -1,40 +1,41 @@
-const Placa = require("./placa");
+const Pentagono = require("./Pentagono");
 const bcrypt = require('bcrypt');
 
 class PlacasDao {
     constructor() {
-        this.placas = [];
+        this.pentagonos = [];
     }
     listar() {
-        return this.placas;
+        return this.pentagonos;
     }
 
-    inserir(placa) {
-        this.validar(placa);
-        this.placas.push(placa);
+    inserir(pentagono) {
+        this.validar(pentagono);
+        pentagono.senha = bcrypt.hashSync(pentagono.senha, 10);
+        this.pentagonos.push(pentagono);
     }
 
-    alterar(id, placa) {
-        this.validar(placa);
-        this.placas[id] = placa;
+    alterar(id, pentagono) {
+        this.validar(pentagono);
+        this.pentagonos[id] = pentagono;
     }
 
     apagar(id) {
-        this.placas.splice(id, 1);
+        this.pentagonos.splice(id, 1);
     }
 
-    validar(placa) {
-        if (placa.nome == '') {
+    validar(pentagono) {
+        if (pentagono.nome == '') {
             throw new Error('mensagem_nome_em_branco');
         }
-        if (placa.lado < 0) {
+        if (pentagono.lado < 0) {
             throw new Error('mensagem_tamanho_invalido');
         }
     }
     autenticar(nome, senha) {
-        for (let placa of this.listar()) {
-            if (placa.nome == nome && bcrypt.compareSync (senha, placa.senha)) {
-                return placa;
+        for (let pentagono of this.listar()) {
+            if (pentagono.nome == nome && bcrypt.compareSync (senha, pentagono.senha)) {
+                return pentagono;
             }
         }
         return null;

@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+<link rel="stylesheet" href="/styles.css">
+
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Index</title>
-    <script src="/_js/area.js"></script>
+    <script src="/_js/pentagono.js"></script>
     <style>
         .grande {
             color: green;
@@ -20,8 +22,8 @@
 </head>
 
 <body>
+    <%- include('cabecalho.ejs') %>
     <img src="/_img/logo.png" alt="logo IFCE" width="300" height="200">
-    <%- include('/home/node/app/views/cabecalho.ejs') %>
 
         <h1>Problema: Cálculo da Área de um Letreiro Publicitário em forma de pentágono.</h1>
         <p><strong>Descrição do problema:</strong></p>
@@ -39,6 +41,40 @@
             <button>Calcular</button>
         </form>
         <div id="resposta"></div>
+        <span>ID papel</span>
+        <input name="id_papel" type="number">
+        </label>
+        <label>
+            <span>Senha</span>
+            <input name="senha" type="password">
+        </label>
+        <button type="submit">Ok</button>
+        </form>
+        <button onclick="listar();">Listar</button>
+        <table>
+            <tr>
+                <th>ID</th>
+                <th>Nome</th>
+                <th>Lado</th>
+                <th>Senha</th>
+                <th>Papel</th>
+                <th>Ações</th>
+            </tr>
+            <tbody id="octogonais">
+                <tr>
+                    <td>1</td>
+                    <td>NG CAR</td>
+                    <td>4</td>
+                    <td>********</td>
+                    <td>Papel</td>
+                    <td>
+                        <button onclick="editar(1);">Editar</button>
+                        <button onclick="apagar(1);">Apagar</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        </div>
 </body>
 
 </html>

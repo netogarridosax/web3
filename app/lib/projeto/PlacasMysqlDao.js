@@ -1,4 +1,4 @@
-const Placa = require("./placa")
+const Pentagono = require("./Pentagono")
 const bcrypt = require('bcrypt')
 
 class PlacasMysqlDao {
@@ -7,26 +7,26 @@ class PlacasMysqlDao {
     }
     listar() {
         return new Promise((resolve, reject) => {
-            this.pool.query('SELECT * FROM placas;', function (error, linhas, fields) {
+            this.pool.query('SELECT o.id, o.nome, o.lado, p.nome as papel FROM pentagono o JOIN papeis p ON o.id_papel = p.id', function (error, linhas, fields) {
                 if (error) {
                     return reject('Erro: ' + error.message);
                 }
-                let placas = linhas.map(linha => {
+                let pentagonos = linhas.map(linha => {
                     let { nome, lado } = linha;
-                    return new Placa(nome, lado);
+                    return new Pentagono(nome, lado);
                 })
-                resolve(placas);
+                resolve(pentagonos);
             });
         });
     }
 
-    inserir(placa) {
-        this.validar(placa);
+    inserir(pentagono) {
+        this.validar(pentagono);
 
         return new Promise((resolve, reject) => {
-            let sql = 'INSERT INTO placas (nome, lado) VALUES (?, ?);';
-            console.log({sql}, placa);
-            this.pool.query(sql, [placa.nome, placa.lado], function (error, resultado, fields) {
+            let sql = 'INSERT INTO pentagonos (nome, lado) VALUES (?, ?);';
+            console.log({sql}, pentagono);
+            this.pool.query(sql, [pentagono.nome, pentagono.lado], function (error, resultado, fields) {
                 if (error) {
                     return reject('Erro: ' + error.message);
                 }
@@ -35,11 +35,11 @@ class PlacasMysqlDao {
         });
     }
 
-    alterar(id, placa) {
-        this.validar(placa);
+    alterar(id, pentagono) {
+        this.validar(pentagono);
         return new Promise((resolve, reject) => {
-            let sql = 'UPDATE placas SET nome=?, lado=? WHERE id=?;';
-            this.pool.query(sql, [placa.nome, placa.lado, id], function (error, resultado, fields) {
+            let sql = 'UPDATE pentagonos SET nome=?, lado=? WHERE id=?;';
+            this.pool.query(sql, [pentagono.nome, pentagono.lado, id], function (error, resultado, fields) {
                 if (error) {
                     return reject('Erro: ' + error.message);
                 }
@@ -51,7 +51,7 @@ class PlacasMysqlDao {
 
     apagar(id) {
         return new Promise((resolve, reject) => {
-            let sql = 'DELETE FROM placas WHERE id=?;';
+            let sql = 'DELETE FROM pentagonos WHERE id=?;';
             this.pool.query(sql, id, function (error, resultado, fields) {
                 if (error) {
                     return reject('Erro: ' + error.message);
@@ -61,24 +61,32 @@ class PlacasMysqlDao {
         });
     }
 
-    validar(placa) {
-        if (placa.nome == '') {
+    validar(pentagono) {
+        if (pentagono.nome == '') {
             throw new Error('mensagem_nome_em_branco');
         }
-        if (placa.lado < 0) {
+        if (pentagono.lado < 0) {
             throw new Error('mensagem_tamanho_invalido');
         }
     }
-    /*
     autenticar(nome, senha) {
-        for (let placa of this.listar()) {
-            if (placa.nome == nome && bcrypt.compareSync(senha, placa.senha)) {
-                return placa;
-            }
-        }
-        return null;
-    }*/
-
-}
+        return new Promise((resolve, reject) => {
+            let sql = 'SELECT * FROM pentagonos WHERE nome=?';
+            this.pool.query(sql, [nome], function (error, linhas, fields) {
+                if (error) {
+                    return reject('Erro: ' + error.message);
+                }
+                for (let linha of linhas) {
+                    console.log('autenticar', senha, linha);
+                    if (bcrypt.compareSync(senha, linha.senha)) {
+                        let { id, nome, lado, papel } = linha;
+                        return resolve(new Pentagono(id, nome, lado, papel));
+                    }
+                }
+                return resolve(null);
+            });
+        });
+    }
+} 
 
 module.exports = PlacasMysqlDao;

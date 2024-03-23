@@ -1,23 +1,47 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
+    <link rel="stylesheet" href="/styles.css">
 </head>
+
 <body>
-    <img src="/_img/logo.png" alt="logo IFCE" width="300" height="200">
-    <%- include('/home/node/app/views/cabecalho.ejs') %>
-    <h1><%= nome %></h1>
-    <section>
-        <h1>Formações</h1>
-        <ul>
-<%
-for (let formacao of formacoes) {
-%>
-            <li><%= formacao %></li>
-<%
-}
-%>
-        </ul>
-    </section>
+    <%- include ('cabecalho.ejs') %>
+        <img src="/_img/logo.png" alt="logo IFCE" width="300" height="200">
+            <div class="autor-info">
+                <div class="autor-texto">
+                    <h1>
+                        <%= autor.nome %>
+                    </h1>
+                    <section class="informacoes">
+                        <h1>Formações</h1>
+                        <ul>
+                            <% for (let formacao of autor.formacoes) { %>
+                                <li>
+                                    <%= formacao %>
+                                </li>
+                                <% } %>
+                        </ul>
+                    </section>
+                    <section class="experiencia">
+                        <h1>Experiência Profissional</h1>
+                        <ul>
+                            <% for (let experiencia of autor.experienciaProfissional) { %>
+                                <li>
+                                    <strong>Cargo:</strong>
+                                    <%= experiencia.cargo %><br>
+                                        <strong>Departamento:</strong>
+                                        <%= experiencia.departamento %><br>
+                                            <strong>Ano:</strong>
+                                            <%= experiencia.ano %>
+                                </li>
+                                <% } %>
+                        </ul>
+                    </section>
+                </div>
+            </div>
+        </div>
 </body>
+
 </html>

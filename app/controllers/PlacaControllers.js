@@ -1,101 +1,128 @@
-const Placa = require('./../lib/projeto/placa');
 const utils = require('../lib/utils');
+const express = require('express');
 
-class PlacasController {
+class PlacaController {
     constructor(placasDao) {
         this.placasDao = placasDao;
     }
-    index(req, res) {
-        utils.renderizarEjs(res, './views/index.ejs');      
-    }
-    area(req, res){               
-        let corpoTexto ='';
-        req.on('data', function (pedaco) {
-            corpoTexto += pedaco;
+
+    getRouter() {
+        const rotas = express.Router();
+        rotas.get('/', (req, res) => {
+            this.listar(req, res);
         });
-        req.on('end', () => {
-            let propriedades = corpoTexto.split('&');
-            let query = {};
-            for (let propriedade of propriedades) {
-                let [variavel, valor] = propriedade.split('=');
-                query[variavel] = valor;
-            }
-            let placa = new Placa();
-            placa.nome = query.nome;
-            placa.lado = parseFloat(query.lado);        
-            utils.renderizarEjs(res, './views/area.ejs', placa);
-        })
+
+        rotas.put('/:id', async (req, res) => {
+            await this.alterar(req, res);
+        });
+
+        rotas.delete('/:id', async (req, res) => {
+            await this.apagar(req, res);
+        });
+
+        rotas.post('/', async (req, res, next) => {
+            await this.inserir(req, res, next);
+        });
+
+        return rotas;
+    }
+
+    index(req, res) {
+        res.render('index');
+    }
+
+    async area(req, res) {
+        try {
+            const { nome, lado } = req.body;
+
+            const pentagono = await this.placasDao.inserir({
+                nome,
+                lado: parseFloat(lado),
+            });
+
+            res.json({
+                placa: {
+                    ...pentagono.dataValues,
+                    area: pentagono.area(),
+                },
+                mensagem: 'mensagem_placa_cadastrado',
+            });
+        } catch (error) {
+            console.error('Erro ao processar área:', error);
+            res.status(400).json({ mensagem: 'Erro ao processar área.' });
+        }
     }
 
     async listar(req, res) {
-        let placas = this.placasDao.listar();
-        let dados = placas.map(placa => {
-            return {
-                ...placa,
-                area: placa.area(),
-            };
-        })
-
-        utils.renderizarJSON(res, dados);
-    }
-    
-    async inserir(req, res) {
-        let placa = await this.getPlacaDaRequisicao(req);
         try {
-            this.placasDao.inserir(placa);
-            utils.renderizarJSON(res, {
+            console.log('Entrando na função listar');
+            let placas = await this.placasDao.listar();
+            console.log('Placas:', placas);
+
+            let dados = placas.map(placa => ({
+                id: placa._id,
+                nome: placa.nome,
+                lado: placa.lado,
+            }));
+
+            res.json(dados);
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ mensagem: 'Erro ao listar placas' });
+        }
+    }
+
+    async inserir(req, res, next) {
+        try {
+            const { nome, lado } = req.body;
+
+            const placa = await this.placasDao.inserir({
+                nome,
+                lado: parseFloat(lado),
+            });
+
+            res.json({
                 placa: {
-                    ...placa,
+                    ...placa.dataValues,
                     area: placa.area(),
                 },
-                mensagem: 'mensagem_placa_cadastrado'
+                mensagem: 'mensagem_placa_cadastrado',
             });
-        } catch (e) {
-            utils.renderizarJSON(res, {
-                mensagem: e.message
-            }, 400);
+        } catch (error) {
+            console.error('Erro ao inserir placa:', error);
+            res.status(400).json({ mensagem: 'Erro ao inserir placa.' });
         }
     }
 
     async alterar(req, res) {
-        let placa = await this.getPlacaDaRequisicao(req);
-        let [ url, queryString ] = req.url.split('?');
-        let urlList = url.split('/');
-        url = urlList[1];
-        let id = urlList[2];
         try {
-            this.placasDao.alterar(id, placa);
-            utils.renderizarJSON(res, {
-                mensagem: 'mensagem_placa_alterado'
+            const { id } = req.params;
+            const { nome, lado } = req.body;
+
+            await this.placasDao.alterar(id, {
+                nome,
+                lado: parseFloat(lado),
             });
-        } catch (e) {
-            utils.renderizarJSON(res, {
-                mensagem: e.message
-            }, 400);
+
+            res.json({ mensagem: 'mensagem_placa_alterado' });
+        } catch (error) {
+            console.error('Erro ao alterar placa:', error);
+            res.status(400).json({ mensagem: 'Erro ao alterar placa.' });
         }
     }
-    
-    apagar(req, res) {
-        let [ url, queryString ] = req.url.split('?');
-        let urlList = url.split('/');
-        url = urlList[1];
-        let id = urlList[2];
-        this.placasDao.apagar(id);
-        utils.renderizarJSON(res, {
-            mensagem: 'mensagem_placa_apagado',
-            id: id
-        });
-    }
 
-    async getPlacaDaRequisicao(req) {
-        let corpo = await utils.getCorpo(req);
-        let placa = new Placa(
-            corpo.nome,
-            parseFloat(corpo.lado),
-            corpo.papel
-        );
-        return placa;
+    async apagar(req, res) {
+        try {
+            const { id } = req.params;
+
+            await this.placasDao.apagar(id);
+
+            res.json({ mensagem: 'mensagem_placa_apagado', id });
+        } catch (error) {
+            console.error('Erro ao apagar placa:', error);
+            res.status(400).json({ mensagem: 'Erro ao apagar placa.' });
+        }
     }
 }
 
-module.exports = PlacasController;
+module.exports = PlacaController;

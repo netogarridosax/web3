@@ -26,7 +26,7 @@ class EstaticoController {
         </head>
         <body>`)
         res.write('<h1>Não encontrado!</h1>');
-        res.write('</body>')
+        res.write('</body></html>');
         res.end();
     }  
 }
