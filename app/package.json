@@ -1,13 +1,13 @@
 {
   "name": "publicitario",
   "version": "1.0.0",
-  "description": "Projeto desWebII",
+  "description": "Projeto desWeb",
   "main": "app.js",
   "scripts": {
     "start": "nodemon app.js"
   },
   "keywords": [
-    "DesWebII"
+    "DesWeb"
   ],
   "author": "Francisco Lourival Garrido Neto",
   "license": "Apache-2.0",
@@ -21,6 +21,7 @@
     "jsonwebtoken": "^9.0.2",
     "mongodb": "^6.5.0",
     "mysql": "^2.18.1",
+    "mysql2": "^3.9.2",
     "nodemon": "^3.0.1",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",

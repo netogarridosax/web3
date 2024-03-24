@@ -1,13 +1,11 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-<link rel="stylesheet" href="/styles.css">
-
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Index</title>
-    <script src="/_js/pentagono.js"></script>
+    <link rel="stylesheet" href="/styles.css">
     <style>
         .grande {
             color: green;
@@ -22,59 +20,60 @@
 </head>
 
 <body>
-    <%- include('cabecalho.ejs') %>
-    <img src="/_img/logo.png" alt="logo IFCE" width="300" height="200">
+    <%- include('/home/node/app/views/cabecalho.ejs') %>
+        <img src="/_img/logo.png" alt="logo IFCE" width="300" height="200">
+        <form method="post" onSubmit="event.preventDefault(); calcularMedia();">
 
-        <h1>Problema: Cálculo da Área de um Letreiro Publicitário em forma de pentágono.</h1>
-        <p><strong>Descrição do problema:</strong></p>
-        <p>Calcule a área de um letreiro publicitário em forma de pentágono. Se a área for maior que 20 metros
-            quadrados, é um letreiro grande. Se for menor que 20 metros quadrados, é um letreiro pequeno.</p>
-        <form method="post" onSubmit="event.preventDefault(); calcularArea();">
+            <h1>Problema: Cálculo da Área de um Letreiro Publicitário em forma de pentágono.</h1>
+            <p><strong>Descrição do problema:</strong></p>
+            <p>Calcule a área de um letreiro publicitário em forma de pentágono. Se a área for maior que 20 metros
+                quadrados, é um letreiro grande. Se for menor que 20 metros quadrados, é um letreiro pequeno.</p>
+            <form method="post" onSubmit="event.preventDefault(); calcularArea();">
+                <label>
+                    <span>Nome</span>
+                    <input name="nome">
+                </label>
+                <label>
+                    <span>Lado</span>
+                    <input name="lado">
+                </label>
+                <button>Calcular</button>
+            </form>
+            <div id="resposta"></div>
             <label>
-                <span>Nome</span>
-                <input name="nome">
+                <span>ID</span>
+                <input name="id_papel" type="number">
             </label>
             <label>
-                <span>Lado do Pentágono (em metros)</span>
-                <input name="lado">
+                <span>Senha</span>
+                <input name="senha" type="password">
             </label>
-            <button>Calcular</button>
-        </form>
-        <div id="resposta"></div>
-        <span>ID papel</span>
-        <input name="id_papel" type="number">
-        </label>
-        <label>
-            <span>Senha</span>
-            <input name="senha" type="password">
-        </label>
-        <button type="submit">Ok</button>
-        </form>
-        <button onclick="listar();">Listar</button>
-        <table>
-            <tr>
-                <th>ID</th>
-                <th>Nome</th>
-                <th>Lado</th>
-                <th>Senha</th>
-                <th>Papel</th>
-                <th>Ações</th>
-            </tr>
-            <tbody id="octogonais">
+            <button type="submit" onclick="login();">Ok</button>
+            <button onclick="listar();">Listar</button>
+            <table>
                 <tr>
-                    <td>1</td>
-                    <td>NG CAR</td>
-                    <td>4</td>
-                    <td>********</td>
-                    <td>Papel</td>
-                    <td>
-                        <button onclick="editar(1);">Editar</button>
-                        <button onclick="apagar(1);">Apagar</button>
-                    </td>
+                    <th>ID</th>
+                    <th>Nome</th>
+                    <th>Lado</th>
+                    <th>Ações</th>
+                    <th></th>
                 </tr>
-            </tbody>
-        </table>
-        </div>
+                <tbody id="placas">
+                    <tr>
+                        <td>1</td>
+                        <td>NG CAR</td>
+                        <td>4</td>
+                        <td>7</td>
+                        <td>
+                            <button onclick="editar(1);">Editar</button>
+                            <button onclick="apagar(1);">Apagar</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- Inclua o arquivo JavaScript onde a função calcularArea está definida -->
+            <script src="/_js/pentagono.js"></script>
 </body>
 
 </html>

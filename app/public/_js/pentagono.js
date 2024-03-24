@@ -1,5 +1,5 @@
 async function calcularArea() {
-    console.log('teste1');
+   /* console.log('teste1');*/
     try {
         let inputNome = document.querySelector('[name=nome]');
         let nome = inputNome.value;

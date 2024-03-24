@@ -1,7 +1,7 @@
 const utils = require('../lib/utils');
 const express = require('express');
 
-class PlacaController {
+class PlacasControler {
     constructor(placasDao) {
         this.placasDao = placasDao;
     }
@@ -125,4 +125,4 @@ class PlacaController {
     }
 }
 
-module.exports = PlacaController;
+module.exports = PlacasControler;

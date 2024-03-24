@@ -1,4 +1,4 @@
-const Pentagono = require("./Pentagono");
+const Pentagono = require("./Placa");
 const bcrypt = require('bcrypt');
 
 class PlacasDao {

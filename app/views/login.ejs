@@ -1,15 +1,14 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-<link rel="stylesheet" href="/styles.css">
 
 <head>
     <meta charset="UTF-8">
+    <link rel="stylesheet" href="/styles.css">
 </head>
 
 <body>
     <%- include('/home/node/app/views/cabecalho.ejs') %>
     <img src="/_img/logo.png" alt="logo IFCE" width="300" height="200">
-
         <h1>Login</h1>
         <form onSubmit="event.preventDefault(); login();">
             <div id="resposta"></div>
@@ -44,6 +43,7 @@
         else {
             divResposta.innerText = json.mensagem;
         }
+
     }
 </script>
 
