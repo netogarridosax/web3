@@ -35,15 +35,15 @@ class PlacasControler {
         try {
             const { nome, lado } = req.body;
 
-            const pentagono = await this.placasDao.inserir({
+            const placa = await this.placasDao.inserir({
                 nome,
                 lado: parseFloat(lado),
             });
 
             res.json({
                 placa: {
-                    ...pentagono.dataValues,
-                    area: pentagono.area(),
+                    ...placa.dataValues,
+                    area: placa.area(),
                 },
                 mensagem: 'mensagem_placa_cadastrado',
             });

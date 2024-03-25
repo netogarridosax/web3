@@ -1,91 +1,75 @@
-// Esperar pelo carregamento completo da página antes de chamar a função listar()
-if (typeof document !== 'undefined') {
-    document.addEventListener('DOMContentLoaded', function () {
-        listar();
-    });
-}
-
-async function calcularArea() {
-    console.log('teste1');
-    try {
-        let inputNome = document.querySelector('[name=nome]');
-        let inputLado = document.querySelector('[name=lado]');
-        let inputIdPapel = document.querySelector('[name=id_papel]');
-        let inputSenha = document.querySelector('[name=senha]');
-
-        if (!inputNome || !inputLado || !inputIdPapel || !inputSenha) {
-            console.error('Elementos de entrada não encontrados.');
-            return;
-        }
-
-        let nome = inputNome.value;
-        let lado = parseFloat(inputLado.value);
-        let idPapel = parseFloat(inputIdPapel.value);
-        let senha = inputSenha.value;
-
-        let pentagono = { nome, lado, id_papel: idPapel, senha };
-
-        if (idPapel === 0 || isNaN(idPapel)) {
-            await inserir(pentagono);
-        } else {
-            await editar(pentagono, idPapel);
-        }
-
-        exibirDadosFormulario(nome, lado, idPapel, senha);
-    } catch (error) {
-        console.error('Erro ao processar área:', error);
-    }
-}
-
 async function listar() {
-    let divPentagonos = document.querySelector('#pentagonos');
-    if (!divPentagonos) {
-        console.error('Elemento #pentagonos não encontrado.');
+    let divPlacas = document.querySelector('#placas');
+    if (!divPlacas) {
+        console.error('Elemento #placas não encontrado.');
         return;
     }
 
-    divPentagonos.innerText = 'Carregando...';
+    divPlacas.innerText = 'Carregando...';
 
     try {
-        let resposta = await fetch('/pentagonos');
-        let pentagonos = await resposta.json();
+        let resposta = await fetch('/placas');
+        let placas = await resposta.json();
 
-        divPentagonos.innerHTML = '';
+        divPlacas.innerHTML = '';
 
-        for (let pentagono of pentagonos) {
-            // Restante do código...
+        for (let placa of placas) {
+            let linha = document.createElement('tr');
+            let colunaNome = document.createElement('td');
+            let colunaLado = document.createElement('td');
+            let colunaIdPapel = document.createElement('td');
+            let colunaSenha = document.createElement('td');
+            let colunaAcoes = document.createElement('td');
+            let botaoEditar = document.createElement('button');
+            let botaoApagar = document.createElement('button');
+
+            colunaNome.innerText = placa.nome;
+            colunaLado.innerText = placa.lado;
+            colunaIdPapel.innerText = placa.id_papel;
+            colunaSenha.innerText = placa.senha;
+
+            botaoEditar.innerText = 'Editar';
+            botaoEditar.onclick = function () {
+                formEditar(placa.id);
+            };
+
+            botaoApagar.onclick = function () {
+                apagar(placa.id);
+            };
+            botaoApagar.innerText = 'Apagar';
+
+            colunaAcoes.appendChild(botaoEditar);
+            colunaAcoes.appendChild(botaoApagar);
+
+            linha.appendChild(colunaNome);
+            linha.appendChild(colunaLado);
+            linha.appendChild(colunaIdPapel);
+            linha.appendChild(colunaSenha);
+            linha.appendChild(colunaAcoes);
+
+            divPlacas.appendChild(linha);
         }
     } catch (error) {
         console.error('Erro ao listar:', error);
-        divPentagonos.innerText = 'Erro ao obter a lista de pentágonos';
+        divPlacas.innerText = 'Erro ao obter a lista de placas';
     }
 }
 
-async function login() {
+async function apagar(id) {
     try {
-        let nome = document.querySelector('[name=nome]').value;
-        let senha = document.querySelector('[name=senha]').value;
-        let divResposta = document.querySelector('#resposta');
+        let divResposta = await getOrCreateMensagemDiv();
+        if (confirm('Quer apagar o pentágono #' + id + '?')) {
+            let resposta = await fetch('/placas/' + id, {
+                method: 'delete',
+            });
 
-        if (!nome || !senha) {
-            console.error('Nome ou senha não fornecidos.');
-            return;
-        }
+            let respostaJson = await resposta.json();
+            let mensagem = respostaJson.mensagem;
+            divResposta.innerText = traducoes['pt-BR'][mensagem];
 
-        let dados = new URLSearchParams({ nome, senha });
-        let resposta = await fetch('logar', {
-            method: 'post',
-            body: dados
-        });
-        let json = await resposta.json();
-        console.log(json);
-        if (resposta.status == 200) {
-            sessionStorage.setItem('token', json.token);
-            window.location = '/index';
-        } else {
-            divResposta.innerText = json.mensagem;
+            await listar();
         }
     } catch (error) {
-        console.error('Erro ao fazer login:', error);
+        console.error('Erro ao apagar pentágono:', error);
     }
 }

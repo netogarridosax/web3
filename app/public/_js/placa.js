@@ -10,12 +10,12 @@ async function calcularArea() {
         let inputSenha = document.querySelector('[name=senha]');
         let senha = inputSenha.value;
 
-        let pentagono = { nome, lado, id_papel: idPapel, senha };
+        let placa = { nome, lado, id_papel: idPapel, senha };
 
         if (idPapel === 0 || isNaN(idPapel)) {
-            await inserir(pentagono);
+            await inserir(placa);
         } else {
-            await editar(pentagono, idPapel);
+            await editar(placa, idPapel);
         }
 
         exibirDadosFormulario(nome, lado, idPapel, senha);
@@ -24,13 +24,13 @@ async function calcularArea() {
     }
 }
 
-async function inserir(pentagono) {
+async function inserir(placa) {
     try {
         let divResposta = await getOrCreateMensagemDiv();
 
-        let dados = new URLSearchParams(pentagono);
+        let dados = new URLSearchParams(placa);
 
-        let resposta = await fetch('/pentagonos', {
+        let resposta = await fetch('/placas', {
             method: 'post',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
@@ -50,7 +50,7 @@ async function inserir(pentagono) {
         let mensagem = respostaJson.mensagem;
         divResposta.innerText = traducoes['pt-BR'][mensagem];
     } catch (error) {
-        console.error('Erro ao inserir pentágono:', error);
+        console.error('Erro ao inserir placa:', error);
     }
 }
 
@@ -79,13 +79,13 @@ async function getOrCreateMensagemDiv() {
     return divResposta;
 }
 
-async function editar(pentagono, id) {
+async function editar(placa, id) {
     try {
         let divResposta = await getOrCreateMensagemDiv();
 
-        let dados = new URLSearchParams(pentagono);
+        let dados = new URLSearchParams(placa);
 
-        let resposta = await fetch('/pentagonos/' + id, {
+        let resposta = await fetch('/placas/' + id, {
             method: 'put',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
@@ -105,27 +105,27 @@ async function editar(pentagono, id) {
         let mensagem = respostaJson.mensagem;
         divResposta.innerText = traducoes['pt-BR'][mensagem];
     } catch (error) {
-        console.error('Erro ao editar pentágono:', error);
+        console.error('Erro ao editar placa:', error);
     }
 }
 
 async function listar() {
-    let divPentagonos = document.querySelector('#pentagonos');
-    divPentagonos.innerText = 'Carregando...';
+    let divPlacas = document.querySelector('#placas');
+    divPlacas.innerText = 'Carregando...';
 
     try {
-        let resposta = await fetch('/pentagonos');
-        let pentagonos = await resposta.json();
+        let resposta = await fetch('/placas');
+        let placas = await resposta.json();
 
-        divPentagonos.innerHTML = '';
+        divPlacas.innerHTML = '';
 
-        for (let pentagono of pentagonos) {
+        for (let placa of placas) {
             let linha = document.createElement('tr');
 
-            for (let propriedade in pentagono) {
-                if (pentagono.hasOwnProperty(propriedade)) {
+            for (let propriedade in placa) {
+                if (placa.hasOwnProperty(propriedade)) {
                     let coluna = document.createElement('td');
-                    coluna.innerText = pentagono[propriedade];
+                    coluna.innerText = placa[propriedade];
                     linha.appendChild(coluna);
                 }
             }
@@ -136,11 +136,11 @@ async function listar() {
 
             botaoEditar.innerText = 'Editar';
             botaoEditar.onclick = function () {
-                formEditar(pentagono.id);
+                formEditar(placa.id);
             };
 
             botaoApagar.onclick = function () {
-                apagar(pentagono.id);
+                apagar(placa.id);
             };
             botaoApagar.innerText = 'Apagar';
 
@@ -148,19 +148,19 @@ async function listar() {
             colunaAcoes.appendChild(botaoApagar);
 
             linha.appendChild(colunaAcoes);
-            divPentagonos.appendChild(linha);
+            divPlacas.appendChild(linha);
         }
     } catch (error) {
         console.error('Erro ao listar:', error);
-        divPentagonos.innerText = 'Erro ao obter a lista de pentágonos';
+        divPlacas.innerText = 'Erro ao obter a lista de placas';
     }
 }
 
 async function apagar(id) {
     try {
         let divResposta = await getOrCreateMensagemDiv();
-        if (confirm('Quer apagar o pentágono #' + id + '?')) {
-            let resposta = await fetch('/pentagonos/' + id, {
+        if (confirm('Quer apagar o placa #' + id + '?')) {
+            let resposta = await fetch('/placas/' + id, {
                 method: 'delete',
             });
 
@@ -171,6 +171,6 @@ async function apagar(id) {
             await listar();
         }
     } catch (error) {
-        console.error('Erro ao apagar pentágono:', error);
+        console.error('Erro ao apagar placa:', error);
     }
 }

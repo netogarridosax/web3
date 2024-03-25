@@ -24,31 +24,31 @@ class PlacaMongoDao {
         return placas;
     }
 
-    async inserir(pentagono) {
-        this.validar(pentagono);
+    async inserir(placa) {
+        this.validar(placa);
 
-        pentagono.senha = bcrypt.hashSync(pentagono.senha, 10);
+        placa.senha = bcrypt.hashSync(placa.senha, 10);
         
         await this.conectar();
         const collection = this.db.collection(this.colecao);
 
-        const resultado = await collection.insertOne(pentagono);
+        const resultado = await collection.insertOne(placa);
         return resultado.insertedId;
     }
 
-    async alterar(id, pentagono) {
-        this.validar(pentagono);
+    async alterar(id, placa) {
+        this.validar(placa);
 
         await this.conectar();
         const collection = this.db.collection(this.colecao);
 
         const resultado = await collection.updateOne(
             { _id: new ObjectId(id) },
-            { $set: { nome: pentagono.nome, lado: pentagono.lado } }
+            { $set: { nome: placa.nome, lado: placa.lado } }
         );
 
         if (resultado.matchedCount > 0) {
-            return new Pentagono(id, pentagono.nome, pentagono.lado, pentagono.papel);
+            return new Placa(id, placa.nome, placa.lado, placa.papel);
         } else {
             return null;
         }
@@ -75,12 +75,12 @@ class PlacaMongoDao {
         }
     }
 
-    validar(pentagono) {
-        if (!pentagono.nome) {
+    validar(placa) {
+        if (!placa.nome) {
             throw new Error('mensagem_nome_em_branco');
         }
-        if (pentagono.lado < 0) {
-            throw new Error('Lado do pentagono não pode ser menor que 0');
+        if (placa.lado < 0) {
+            throw new Error('Lado do placa não pode ser menor que 0');
         }
     }
     
@@ -92,7 +92,7 @@ class PlacaMongoDao {
 
         if (placa && bcrypt.compareSync(senha, placa.senha)) {
             const { _id, nome, lado, papel } = placa;
-            return new Pentagono(_id, nome, lado, papel);
+            return new Placa(_id, nome, lado, papel);
         }
 
         return null;

@@ -14,17 +14,17 @@ app.get('/' , async (req, res) => {
   try {
     await client.connect();
     const database = client.db('projeto');
-    const movies = database.collection('pentagono');
+    const movies = database.collection('placa');
 
     const query = { title: 'Back to the Future' };
     await movies.deleteOne(query);
 
     const movie = await movies.find();
     let cursor = await movies.find();
-    let pentagonos = await cursor.toArray();
+    let placas = await cursor.toArray();
 
-    console.log('movie', pentagonos);
-    res.render('lista' , {pentagonos});
+    console.log('movie', placas);
+    res.render('lista' , {placas});
   } finally {
     await client.close();
   }

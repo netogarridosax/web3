@@ -1,7 +1,7 @@
 const bcrypt = require('bcrypt');
 const { DataTypes, Model } = require('sequelize');
 
-class Pentagono extends Model {
+class Placa extends Model {
     static init(sequelize) {
         return super.init({
             nome: DataTypes.TEXT,
@@ -24,11 +24,11 @@ class Pentagono extends Model {
 class PlacaSequelizeDao {
     constructor(sequelize) {
         this.sequelize = sequelize;
-        this.Pentagono = Pentagono.init(this.sequelize);
+        this.Placa = Placa.init(this.sequelize);
 
         (async () => {
             try {
-                await this.Pentagono.sync();
+                await this.Placa.sync();
                 console.log('Tabela criada com sucesso!');
             } catch (error) {
                 console.error('Erro ao criar tabela:', error);
@@ -37,57 +37,57 @@ class PlacaSequelizeDao {
     }
 
     async listar() {
-        return this.Pentagono.findAll();
+        return this.Placa.findAll();
     }
 
-    async inserir(pentagono) {
-        this.validar(pentagono);
-        pentagono.senha = bcrypt.hashSync(pentagono.senha, 10);
+    async inserir(placa) {
+        this.validar(placa);
+        placa.senha = bcrypt.hashSync(placa.senha, 10);
 
-        return this.Pentagono.create(pentagono);
+        return this.placa.create(placa);
     }
 
-    async alterar(id, pentagono) {
-        this.validar(pentagono, true);
-        if (!pentagono) {
-            throw new Error('Objeto pentagono é nulo ou indefinido');
+    async alterar(id, placa) {
+        this.validar(placa, true);
+        if (!placa) {
+            throw new Error('Objeto placa é nulo ou indefinido');
         }
 
-        let obj = { ...pentagono.dataValues };
+        let obj = { ...placa.dataValues };
         Object.keys(obj).forEach(key => {
             if (obj[key] === null || obj[key] === undefined) {
                 delete obj[key];
             }
         });
 
-        await this.Pentagono.update(obj, { where: { id: id } });
+        await this.Placa.update(obj, { where: { id: id } });
     }
 
     async apagar(id) {
-        return this.Pentagono.destroy({ where: { id: id } });
+        return this.Placa.destroy({ where: { id: id } });
     }
 
-    validar(pentagono, permitirSenhaEmBranco = false) {
-        if (!pentagono.nome) {
+    validar(placa, permitirSenhaEmBranco = false) {
+        if (!placa.nome) {
             throw new Error('mensagem_nome_em_branco');
         }
-        if (!permitirSenhaEmBranco && !pentagono.senha) {
+        if (!permitirSenhaEmBranco && !placa.senha) {
             throw new Error('mensagem_senha_em_branco');
         }
-        if (pentagono.lado < 0) {
+        if (placa.lado < 0) {
             throw new Error('mensagem_lado_invalido');
         }
     }
 
     async autenticar(nome, senha) {
-        let pentagono = await this.Pentagono.findOne({ where: { nome } });
+        let placa = await this.Placa.findOne({ where: { nome } });
 
-        if (pentagono && pentagono.senha && bcrypt.compareSync(senha, pentagono.senha)) {
-            return pentagono;
+        if (placa && placa.senha && bcrypt.compareSync(senha, placa.senha)) {
+            return placa;
         }
 
         // Retorna null se o usuário não for encontrado ou as senhas não coincidirem
-        return pentagono;
+        return placa;
     }
 }
 
