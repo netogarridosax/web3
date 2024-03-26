@@ -22,7 +22,7 @@ function calcularArea() {
     }
 
     divResposta.append(div);
-}
+
 */
 inserir({
     nome, lado, senha, id_papel
