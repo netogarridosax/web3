@@ -1,7 +1,6 @@
-const utils = require("../lib/utils")
 
 class AutorController {
-    autor(req, res) {
+    index(req, res) {
         let autor = {
             nome: 'Garrido',
             formacoes: [
@@ -9,7 +8,7 @@ class AutorController {
             ]
         }
 
-        utils.renderizarEjs(res, './views/autor.ejs', autor);
+        res.render('autor', autor);
     }
 }
 module.exports = AutorController;

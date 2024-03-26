@@ -11,6 +11,7 @@ class PlacasDao {
 
     inserir(placa) {
         this.validar(placa);
+        placa.senha = bcrypt.hashSync(placa.senha, 10);
         this.placas.push(placa);
     }
 
@@ -27,6 +28,9 @@ class PlacasDao {
         if (placa.nome == '') {
             throw new Error('mensagem_nome_em_branco');
         }
+        if (!placa.senha) {
+            throw new Error('mensagem_senha_em_branco');
+        }    
         if (placa.lado < 0) {
             throw new Error('mensagem_tamanho_invalido');
         }

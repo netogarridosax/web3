@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken');
 
 class AuthController {
     constructor(usuariosDao) {
-        this.usuariosDao = usuariosDao;
+        this.placasDao = this.placasDao;
         this.SEGREDO_JWT = process.env.SEGREDO_JWT;
     }
 
@@ -12,22 +12,19 @@ class AuthController {
     }
 
     async logar(req, res) {
-        let corpo = await utils.getCorpo(req);
-        console.log({corpo});
-        let usuario = await this.usuariosDao.autenticar(corpo.nome, corpo.senha);
-        console.log({usuario});
+        let usuario = await this.placasDao.autenticar(req.body.nome, req.body.senha);
         if (usuario) {
             console.log({usuario});          
             let token = jwt.sign({
-                ...usuario
+                ...usuario.toJSON()
             }, this.SEGREDO_JWT);
-            utils.renderizarJSON(res, {
+            res.json({
                 token,
                 mensagem: 'Usuário logado com sucesso!'
             });
         }
         else {
-            utils.renderizarJSON(res, {
+            res.json({
                 mensagem: 'Usuário ou senha inválidos!'
             }, 401);
         }
@@ -35,16 +32,13 @@ class AuthController {
 
     autorizar(req, res, proximoControlador, papeisPermitidos) {
         console.log('autorizando', req.headers);
-        let token = req.headers.authorization.split(' ')[0];
-        console.log(token);
-        console.log(this.SEGREDO_JWT);
         try {
+            let token = req.headers.authorization.split(' ')[1];
             let usuario = jwt.verify(token, this.SEGREDO_JWT);
             req.usuario = usuario;
             console.log({usuario}, papeisPermitidos);
-            console.log(usuario.papel);
 
-            if (papeisPermitidos.includes(usuario.papel)) {
+            if (papeisPermitidos.includes(usuario.papel) || papeisPermitidos.length == 0) {
                 proximoControlador();
             }
             else {
@@ -55,7 +49,8 @@ class AuthController {
 
         } catch (e) {
             utils.renderizarJSON(res, {
-                mensagem: 'Não autenticado!'
+                mensagem: 'Não autenticado!',
+                error: e.message
             }, 401);
         }
 

@@ -6,7 +6,8 @@
 <body>
     <%- include('/home/node/app/views/cabecalho.ejs') %>
     <h1>Login</h1>
-    <form action="logar" method="post">
+    <form onSubmit="event.preventDefault(); login();">
+        <div id="resposta"></div>
         <label>
             <span>Nome</span>
             <input name="nome">
@@ -18,4 +19,27 @@
         <button>Ok</button>
     </form>
 </body>
+<script>
+    async function login() {
+        let nome = document.querySelector('[name=nome]').value;
+        let senha = document.querySelector('[name=senha]').value;
+        let divResposta = document.querySelector('#resposta');
+        
+        let dados = new URLSearchParams({nome, senha});
+        let resposta = await fetch('logar', {
+            method: 'post',
+            body: dados
+        });
+        let json = await resposta.json();
+        console.log(json);
+        if (resposta.status == 200) {
+            sessionStorage.setItem('token', json.token);
+            window.location = '/index';
+        }
+        else {
+            divResposta.innerText = json.mensagem;
+        }
+
+    }
+</script>
 </html>

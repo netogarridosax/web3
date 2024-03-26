@@ -1,31 +1,27 @@
 const Placa = require("./placa")
 const bcrypt = require('bcrypt')
 
-class PlacasMysqlDao {
-    constructor(pool) {
-        this.pool = pool;
+class PlacasMongoDao {
+    constructor(client) {
+        this.client = client;
+        this.banco = 'projeto';
+        this.colecao = 'placas';
     }
-    listar() {
-        return new Promise((resolve, reject) => {
-            this.pool.query('SELECT * FROM placas;', function (error, linhas, fields) {
-                if (error) {
-                    return reject('Erro: ' + error.message);
-                }
-                let placas = linhas.map(linha => {
-                    let { nome, lado } = linha;
-                    return new Placa(nome, lado);
-                })
-                resolve(placas);
-            });
-        });
+    async listar() {
+        await this.client.connect();
+        const database = this.client.db(this.banco);
+        const collection = database.collection(this.colecao);
+    
+        const placas = await collection.find();
+        return await placas.toArray()
     }
 
     inserir(placa) {
         this.validar(placa);
         placa.senha = bcrypt.hashSync(placa.senha, 10);
-
+        
         return new Promise((resolve, reject) => {
-            let sql = `INSERT INTO placas (nome, lado, senha, id_papel) VALUES (?, ?, ?, ?, ?);
+            let sql = `INSERT INTO placas (nome, lado, , senha, id_papel) VALUES (?, ?, ?, ?, ?);
             `;
             console.log({sql}, placa);
             this.pool.query(sql, [placa.nome, placa.lado, placa.senha, placa.id_papel], function (error, resultado, fields) {
@@ -39,13 +35,13 @@ class PlacasMysqlDao {
 
     alterar(id, placa) {
         this.validar(placa);
-        this.estudantes[id] = estudante;
+        this.placas[id] = placa;
     }
-    
+
     apagar(id) {
         return new Promise((resolve, reject) => {
-            let sql = 'DELETE FROM placas WHERE id=?;';
-            this.pool.query(sql, id, function (error, resultado, fields) {
+            let sql = `DELETE FROM placas WHERE id=?;`;
+            this.pool.query(sql, [id], function (error, resultado, fields) {
                 if (error) {
                     return reject('Erro: ' + error.message);
                 }
@@ -55,18 +51,18 @@ class PlacasMysqlDao {
     }
 
     validar(placa) {
-        console.log(2, estudante);
-        if (placa.nome) {
+        console.log(2, placa);
+        if (!placa.nome) {
             throw new Error('mensagem_nome_em_branco');
         }
         if (!placa.senha) {
             throw new Error('mensagem_senha_em_branco');
-        
         }
-        if (placa.lado < 0) {
-            throw new Error('mensagem_tamanho_invalido');
+        if (placa.lado < 0 || placa.lado > 10) {
+            throw new Error('mensagem_placa_invalida');
         }
     }
+
     autenticar(nome, senha) {
         return new Promise((resolve, reject) => {
             let sql = `SELECT e.*, p.nome as papel FROM placas e JOIN papeis p ON e.id_papel = p.id WHERE e.nome=?`;
@@ -85,7 +81,6 @@ class PlacasMysqlDao {
             });
         });
     }
-
 }
 
-module.exports = PlacasMysqlDao;
+module.exports = PlacasMongoDao;

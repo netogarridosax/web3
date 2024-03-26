@@ -3,8 +3,9 @@
 
 <head>
     <meta charset="UTF-8">
+    <script src="/_js/area.js"></script>
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Index</title>
     <script src="/_js/area.js"></script>
     <style>
         .grande {
@@ -17,28 +18,72 @@
             font-weight: bold;
         }
     </style>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
 </head>
 
-<body>
-    <img src="/_img/logo.png" alt="logo IFCE" width="300" height="200">
+<body id="app">
     <%- include('/home/node/app/views/cabecalho.ejs') %>
-
-        <h1>Problema: Cálculo da Área de um Letreiro Publicitário em forma de pentágono.</h1>
-        <p><strong>Descrição do problema:</strong></p>
-        <p>Calcule a área de um letreiro publicitário em forma de pentágono. Se a área for maior que 20 metros
-            quadrados, é um letreiro grande. Se for menor que 20 metros quadrados, é um letreiro pequeno.</p>
-        <form method="post" onSubmit="event.preventDefault(); calcularArea();">
-            <label>
-                <span>Nome</span>
-                <input name="nome">
-            </label>
-            <label>
-                <span>Lado do Pentágono (em metros)</span>
-                <input name="lado">
-            </label>
-            <button>Calcular</button>
-        </form>
+    <img src="/_img/logo.png" alt="logo IFCE" width="300" height="200">
+    <h1>Problema: Cálculo da Área de um Letreiro Publicitário em forma de pentágono.</h1>
+    <p><strong>Descrição do problema:</strong></p>
+    <p>Calcule a área de um letreiro publicitário em forma de pentágono. Se a área for maior que 20 metros
+        quadrados, é um letreiro grande. Se for menor que 20 metros quadrados, é um letreiro pequeno.</p>    <form method="post" @submit.prevent="inserir">
         <div id="resposta"></div>
+        <label>
+            <span>Nome</span>
+            <input name="nome" v-model="nome">
+        </label>
+        <label>
+            <span>Lado</span>
+            <input name="lado">
+        </label>
+        <label>
+            <span>Senha</span>
+            <input name="senha" type="password">
+        </label>
+        <label>
+            <span>ID papel</span>
+            <input name="id_papel" type="number">
+        </label>
+        <button>Ok</button>
+    </form>
+    <button onclick="listar();">Listar</button>
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>Nome</th>
+            <th>Lado</th>
+            <th></th>
+        </tr>
+        <tbody id="placas">
+            <tr v-for="nome of nomes">
+                <td>1</td>
+                <td>{{nome}}</td>
+                <td>4</td>
+                <td>7</td>
+                <td>
+                    <button onclick="editar(1);">Editar</button>
+                    <button onclick="apagar(1);">Apagar</button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
 </body>
-
 </html>
+<script type="module">
+    
+    Vue.createApp({
+      setup() {
+        const nome = Vue.ref('')
+        const nomes = Vue.ref([])
+        function inserir() {
+            nomes.value.push(nome.value);
+        }
+        return {
+            nome,
+            nomes,
+            inserir
+        }
+      }
+    }).mount('#app')
+</script>

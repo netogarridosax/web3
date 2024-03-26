@@ -1,3 +1,5 @@
+const { Sequelize, DataTypes, Model } = require('sequelize');
+
 class Placa {
     constructor(nome, lado, senha, papel) {
         this.nome = nome;

@@ -1,93 +1,74 @@
 const express = require('express');
-const bodyParser = require('body-parser');
-const http = require('http');
-const mysql = require('mysql');
+const app = express()
+const port = 3000
 
 const PlacaController = require('./controllers/PlacaControllers');
 const EstaticoController = require('./controllers/EstaticoController');
 const AutorController = require('./controllers/AutorController');
 const AuthController = require('./controllers/AuthController');
-const UsuariosController = require('./controllers/UsuariosControllers');
+const PlacasMongoDao = require('./lib/projeto/PlacasMongoDao');
 const PlacasDao = require('./lib/projeto/PlacasDao');
-const UsuariosDao = require('./lib/projeto/UsuariosDao');
-const PlacasMysqlDao = require('./lib/projeto/PlacasMysqlDao');
-const UsuariosMysqlDao = require('./lib/projeto/UsuariosMysqlDao');
+const Sequelize = require("sequelize");
+const passport = require('passport');
+const JwtStrategy = require('passport-jwt').Strategy,
+    ExtractJwt = require('passport-jwt').ExtractJwt;
+const { MongoClient } = require("mongodb");
 
-const app = express();
-const PORT = process.env.PORT || 3000;
+const uri = `mongodb://${process.env.MONGO_INITDB_ROOT_USERNAME}:${process.env.MONGO_INITDB_ROOT_PASSWORD}@mongo`;
+const mongoClient = new MongoClient(uri);
 
-const pool = mysql.createPool({
-    connectionLimit: 10,
-    host: 'bd',
-    user: process.env.MARIADB_USER,
-    password: process.env.MARIADB_PASSWORD,
-    database: process.env.MARIADB_DATABASE
-});
+let opts = {}
+opts.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
+opts.secretOrKey = process.env.SEGREDO_JWT;
+passport.use(new JwtStrategy(opts, function(jwt_payload, done) {
+    console.log('verificação jwt', jwt_payload);
+    return done(null, jwt_payload);
+}));
 
-app.use(bodyParser.urlencoded({ extended: true }));
+app.set('view engine', 'ejs');
 
-let placasDao = new PlacasDao();
-let usuariosDao = new UsuariosDao();
-let placaController = new PlacaController(placasDao);
+let placasDao = new PlacasMongoDao(mongoClient);
+let placasController = new PlacaController(placasDao);
 let estaticoController = new EstaticoController();
 let autorController = new AutorController();
-let authController = new AuthController(usuariosDao);
-let usuariosController = new UsuariosController(usuariosDao);
+let authController = new AuthController(placasDao);
 
-app.get('/index', (req, res) => {
-    placaController.index(req, res);
+app.use(express.static('public'))
+app.use(express.urlencoded({ extended: false }));
+//app.use(express.json());
+
+app.use((req, res, next) => {
+    res.locals.dadosPersonalizados = { chave: 'valor' };
+    console.log('middleware 0')
+    next();
 });
+app.use('/placas', placasController.getRouter());
 
-app.get('/area', (req, res) => {
-    placaController.area(req, res);
+app.use((req, res, next) => {
+    res.locals.dadosPersonalizados = { chave: 'valor' };
+    console.log('middleware 1')
+    next();
 });
-
-app.get('/placas', (req, res) => {
-    authController.autorizar(req, res, () => {
-        placaController.listar(req, res);
-    }, ['admin', 'geral']);
+app.get([
+    '/',
+    '/index'
+    ], (req, res) => {
+        console.log('custom', req.dadosPersonalizados); // { chave: 'valor' }
+        placasController.index(req, res)
 });
-
-app.post('/placas', (req, res) => {
-    authController.autorizar(req, res, () => {
-        placaController.inserir(req, res);
-    }, ['admin', 'geral']);
-});
-
-app.put('/placas', (req, res) => {
-    authController.autorizar(req, res, () => {
-        placaController.alterar(req, res);
-    }, ['admin', 'geral']);
-});
-
-app.delete('/placas', (req, res) => {
-    authController.autorizar(req, res, () => {
-        placaController.apagar(req, res);
-    }, ['admin']);
-});
-
-app.get('/usuarios', (req, res) => {
-    usuariosController.listar(req, res);
-});
-
-app.post('/usuarios', (req, res) => {
-    usuariosController.inserir(req, res);
-});
-
-app.put('/usuarios', (req, res) => {
-    authController.autorizar(req, res, () => {
-        usuariosController.alterar(req, res);
-    }, ['admin', 'geral']);
-});
-
-app.delete('/usuarios', (req, res) => {
-    authController.autorizar(req, res, () => {
-        usuariosController.apagar(req, res);
-    }, ['admin']);
+  
+app.use((req, res, next) => {
+    res.locals.dadosPersonalizados = { chave: 'valor' };
+    console.log('middleware 2')
+    next();
 });
 
 app.get('/autor', (req, res) => {
-    autorController.autor(req, res);
+    autorController.index(req, res);
+});
+
+app.get('/perfil', passport.authenticate('jwt', { session: false, failureRedirect: '/login' }), (req, res) => {
+    res.json({'usuario': req.user});
 });
 
 app.get('/login', (req, res) => {
@@ -98,12 +79,20 @@ app.post('/logar', (req, res) => {
     authController.logar(req, res);
 });
 
-app.use((req, res) => {
-    estaticoController.procurar(req, res);
+app.get('/lista', async (req, res) => {
+    let placas = await placasDao.listar();
+    res.render('lista', {placas});
 });
 
-app.listen(PORT, () => {
-    console.log(`Server listening on port ${PORT}`);
+app.get('*', (req, res, next) => {
+    res.status(404).send('Nao encontrado')
 });
 
-// TESTE COMMIT
+app.use(function (err, req, res, next) {
+    console.error('registrando erro: ', err.stack)
+    res.status(500).send('Erro no servidor: ' + err.message);
+});
+
+app.listen(port, () => {
+  console.log(`Example app listening on port ${port}`)
+})
